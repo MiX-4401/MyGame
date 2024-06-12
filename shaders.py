@@ -6,7 +6,6 @@ class Shaders:
         
         self.ctx: mgl.Context = ctx
 
-        
         self.programs:      dict = {}
         self.vaos:          dict = {}
         self.buffers:       dict = {}
@@ -16,13 +15,23 @@ class Shaders:
             "frag": {}
         }
         
+        
+
+        self.init_load()
+        
+    def init_load(self):
+
+        # Load relevant shader data
         self.load_shaders(paths=(
             r"_shaders\main.vert",
             r"_shaders\main.frag"
         ))
 
-        self.load_base_shader()
-        
+        # Load nessecary moderngl resources
+        self.create_program(title="main", vert=self.shaders["vert"]["main"], frag=self.shaders["frag"]["main"])
+        self.create_buffer(title="main", data=array([-1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0, -1.0, -1.0, 0.0, 1.0, 1.0, -1.0, 1.0, 1.0], dtype="f4"))
+        self.create_vao(title="main", program="main", buffer="main", args=["2f 2f", "bPos", "bTexCoord"])
+
 
     def load_shaders(self, paths:tuple):
 
@@ -35,11 +44,6 @@ class Shaders:
             with open(file=path, mode="r") as f:
                 data = f.read()
                 self.shaders[extension].update({name: data})   
-
-    def load_base_shader(self):
-        self.create_program(title="main", vert=self.shaders["vert"]["main"], frag=self.shaders["frag"]["main"])
-        self.create_buffer(title="main", data=array([-1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0, -1.0, -1.0, 0.0, 1.0, 1.0, -1.0, 1.0, 1.0], dtype="f4"))
-        self.create_vao(title="main", program="main", buffer="main", args=["2f 2f", "bPos", "bTexCoord"])
 
     def create_program(self, title:str, vert:str, frag:str):
         self.programs[title]: mgl.Program = self.ctx.program(vertex_shader=vert, fragment_shader=frag)

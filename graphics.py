@@ -1,24 +1,47 @@
 import moderngl as mgl
 
 class Graphics:
-    def __init__(self):
+    def __init__(self, ctx:mgl.Context):
+
+        self.ctx: mgl.Context = ctx
 
         self.pg_surfaces:       dict = {}
-        self.mgl_contexts:      dict = {}
         self.mgl_framebuffers:  dict = {}
         self.mgl_textures:      dict = {}
 
-    def create_context(self, title:str, auxiliary:bool=False):
-        if not auxiliary:
-            self.mgl_contexts[title]: mgl.Context = mgl.create_context()
-        else:
-            self.mgl_contexts[title]: mgl.Context = mgl.create_standalone_context()
+    def load_init(self):
 
-    def create_framebuffer(self, title:str, attachments:list=[], ctx:mgl.Context="main"):
-        self.mgl_framebuffers[title]: mgl.Framebuffer = self.mgl_contexts[ctx].framebuffer(color_attachments=attachments)
+        # Create moderngl context
+        self.ctx: mgl.Context = mgl.create_context()
+        
+        # Enable moderngl context settings
+        self.ctx.enable(mgl.BLEND)
+
+        # Create main 'mgl texture' from the main 'pg surface'
+        self.create_texture(
+            title="main", 
+            size=self.pg_surfaces["main"].get_size(), 
+            components=4, 
+            swizzle="BGRA", 
+            method=(mgl.NEAREST, mgl.NEAREST)
+        )
+
+        # Write the main 'pg surface' onto the 'mgl texture'
+        self.mgl_textures["main"].write(
+            data=self.pg_surfaces["main"].get_view("1")
+        )
+
+        # Bind the main 'mgl texture' to the 'main framebuffer'
+        self.create_framebuffer(
+            title="main", 
+            attachments=[self.mgl_textures["main"]]
+        )
     
-    def create_texture(self, title:str, size:tuple, ctx:mgl.Context="main", components:int=4, method:str="nearest", swizzle:str="RGBA"):
-        self.mgl_textures[title]: mgl.Texture = self.mgl_contexts[ctx].texture(size=size, components=components)
+    def create_framebuffer(self, title:str, attachments:list=[]):
+        self.mgl_framebuffers[title]: mgl.Framebuffer = self.ctx.framebuffer(color_attachments=attachments)
+    
+    def create_texture(self, title:str, size:tuple, components:int=4, method:str="nearest", swizzle:str="RGBA"):
+        self.mgl_textures[title]: mgl.Texture = self.ctx.texture(size=size, components=components)
         
         self.mgl_textures[title].swizzle: str = swizzle
         if method == "nearest":

@@ -15,6 +15,12 @@ class Main:
         self.time: int = 0
         self.fps:  int = 0
 
+        self.load_graphics()
+        self.load_modules()
+
+        self.run()
+
+    def load_graphics(self):
 
         # Load the graphics module
         self.modules["graphics"]: Graphics = Graphics()
@@ -24,17 +30,12 @@ class Main:
         self.modules["graphics"].pg_surfaces["main"]: pg.Surface = pg.display.set_mode(self.screen_size, pg.DOUBLEBUF | pg.OPENGL)
         pg.display.set_caption(self.caption)
 
-        # Load additional modules
-        self.modules["graphics"].create_context(title="main", auxiliary=False)
-        self.modules["shaders"]: Shaders  = Shaders(self.modules["graphics"].mgl_contexts["main"])
-
         # Moderngl Boilerplate
-        self.modules["graphics"].mgl_contexts["main"].enable(mgl.BLEND)
-        self.modules["graphics"].create_texture(title="main", size=self.modules["graphics"].pg_surfaces["main"].get_size(), components=4, swizzle="BGRA", method=mgl.NEAREST)
-        self.modules["graphics"].create_framebuffer(title="main", attachments=[self.modules["graphics"].mgl_textures["main"]])
-        self.modules["graphics"].mgl_textures["main"].write(data=self.modules["graphics"].pg_surfaces["main"].get_view("1"))
-        self.c: list = [0,0,0]
-        self.run()
+        self.modules["graphics"].load_init()
+
+
+    def load_modules(self):
+        self.modules["shaders"]: Shaders = Shaders(self.modules["graphics"].ctx)
 
     def garbage_cleanup(self):
         for module in self.modules:
