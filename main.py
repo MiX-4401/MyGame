@@ -1,8 +1,10 @@
 import pygame   as pg
 import moderngl as mgl
+import traceback as trace
+from sys import exit
 from graphics import *
 from shaders import *
-from sys import exit
+from sprites import *
 
 class Main:
     def __init__(self, screen_size:tuple, caption:str):
@@ -33,17 +35,17 @@ class Main:
         # Moderngl Boilerplate
         self.modules["graphics"].load_init()
 
-
     def load_modules(self):
-        self.modules["shaders"]: Shaders = Shaders(self.modules["graphics"].ctx)
+        self.modules["shaders"]: Shaders = Shaders(self.modules["graphics"].ctx)    # Load 'Shaders' module
+        self.modules["sprites"]: Sprites = Sprites()                                # Load 'Sprites' module
 
     def garbage_cleanup(self):
+        print("============GARBAGE=============")
+
         for module in self.modules:
             self.modules[module].garbage_cleanup()
 
-        for cont in self.modules["graphics"].mgl_contexts:
-            self.modules["graphics"].mgl_contexts[cont].release()
-            print("Main: releasing: {} @ {}".format(cont, self.modules["graphics"].mgl_contexts[cont]))
+        self.modules["graphics"].ctx.release()
 
         print("Exit Complete")
  
@@ -59,29 +61,45 @@ class Main:
         self.fps = self.pg_clocks["main"].get_fps()
         pg.display.set_caption(f"Game | FPS: {round(self.fps)}")
 
-    def draw(self):
-        
-        self.modules["graphics"].pg_surfaces["main"].fill(color=(0,0,0))
+        self.time += 1
 
-        self.modules["graphics"].mgl_textures["main"].write(
-            self.modules["graphics"].pg_surfaces["main"].get_view("1")
+    def draw(self):
+
+        # Reset main pg surface
+        self.modules["graphics"].pg_surfaces["main"].fill(color=(0,0,0,225))
+
+        #TEST#
+        self.modules["graphics"].pg_surfaces["main"].blit(
+            source=self.modules["sprites"].spritesheets["spritesheet1"][0],
+            dest=(0,0)
         )
 
-        self.modules["graphics"].mgl_contexts["main"].screen.use()
-        self.modules["graphics"].mgl_contexts["main"].screen.clear()
+        # Write pg surface to mgl texture
+        self.modules["graphics"].mgl_textures["main"].write(
+            data=self.modules["graphics"].pg_surfaces["main"].get_view("1")
+        )
+
+        # Render texture to screen
+        self.modules["graphics"].ctx.screen.use()
         self.modules["graphics"].mgl_textures["main"].use(location=0)
-        self.modules["shaders"].programs["main"]["uTexture"] = 0 
+        self.modules["shaders"].programs["main"]["uTexture"] = 0
         self.modules["shaders"].vaos["main"].render(mode=mgl.TRIANGLE_STRIP)
 
         pg.display.flip()
 
     def run(self):
         while True:
-            self.check_events()
-            self.update()
-            self.draw()
-            self.pg_clocks["main"].tick(60)
-            
+            try:
+                self.check_events()
+                self.update()
+                self.draw()
+                self.pg_clocks["main"].tick(60)
+            except Exception as e:
+                print("===============ERROR===============")
+                print(f"Error:      {e}\n")
+                trace.print_exc()
+
+                self.garbage_cleanup()
 
 if __name__ == "__main__":
     main: Main = Main(screen_size=(600, 500), caption="Game")
