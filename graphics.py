@@ -1,9 +1,7 @@
 import moderngl as mgl
 
 class Graphics:
-    def __init__(self, ctx:mgl.Context):
-
-        self.ctx: mgl.Context = ctx
+    def __init__(self):
 
         self.pg_surfaces:       dict = {}
         self.mgl_framebuffers:  dict = {}
