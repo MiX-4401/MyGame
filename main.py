@@ -19,7 +19,9 @@ class Main:
 
         self.load_graphics()
         self.load_modules()
-        self.load_graphics_api()
+        
+        self.modules["shaders"].create_program(title="shader", vert=self.modules["shaders"].shaders["vert"]["main"], frag=self.modules["shaders"].shaders["frag"]["shader"])
+        self.modules["shaders"].create_vao(title="shader", program="shader", buffer="main", args=["2f 2f", "bPos", "bTexCoord"])
 
         self.run()
 
@@ -38,15 +40,18 @@ class Main:
 
     def load_modules(self):
         self.modules["shaders"]: Shaders = Shaders(self.modules["graphics"].ctx)    # Load 'Shaders' module
+        self.load_graphics_api()
         self.modules["sprites"]: Sprites = Sprites()                                # Load 'Sprites' module
 
     def load_graphics_api(self):
         
         # Load graphics-api resources
-        self.modules["shaders"].create_program(title="blit", vert=self.modules["shaders"].shaders["vert"]["blit"], frag=self.modules["shaders"].shaders["frag"]["main"])
-        self.modules["shaders"].create_program(title="flip", vert=self.modules["shaders"].shaders["vert"]["flip"], frag=self.modules["shaders"].shaders["frag"]["main"])
-        self.modules["shaders"].create_vao(title="blit", program="blit", buffer="main", args=["2f 2f", "bPos", "bTexCoord"])
-        self.modules["shaders"].create_vao(title="flip", program="flip", buffer="main", args=["2f 2f", "bPos", "bTexCoord"])
+        self.modules["shaders"].create_program(title="display", vert=self.modules["shaders"].shaders["vert"]["display"], frag=self.modules["shaders"].shaders["frag"]["display"])
+        self.modules["shaders"].create_program(title="blit",    vert=self.modules["shaders"].shaders["vert"]["blit"],    frag=self.modules["shaders"].shaders["frag"]["display"])
+        self.modules["shaders"].create_program(title="flip",    vert=self.modules["shaders"].shaders["vert"]["flip"],    frag=self.modules["shaders"].shaders["frag"]["display"])
+        self.modules["shaders"].create_vao(title="display", program="display", buffer="main", args=["2f 2f", "bPos", "bTexCoord"])
+        self.modules["shaders"].create_vao(title="blit",    program="blit",    buffer="main", args=["2f 2f", "bPos", "bTexCoord"])
+        self.modules["shaders"].create_vao(title="flip",    program="flip",    buffer="main", args=["2f 2f", "bPos", "bTexCoord"])
 
         # Load graphics-api
         Texture.init(ctx=self.modules["graphics"].ctx, program=self.modules["shaders"].programs["blit"], vao=self.modules["shaders"].vaos["blit"])
@@ -54,13 +59,18 @@ class Main:
         Transform.init(
             ctx=self.modules["graphics"].ctx, 
             programs={
-                "scale": self.modules["shaders"].programs["main"],
+                "scale": self.modules["shaders"].programs["display"],
                 "flip":  self.modules["shaders"].programs["flip"]
             },
             vaos={
-            "scale": self.modules["shaders"].vaos["main"],
+            "scale": self.modules["shaders"].vaos["display"],
             "flip":  self.modules["shaders"].vaos["flip"]
             }
+        )
+
+        self.modules["graphics"].canvases["main"] = Canvas.load(
+            size=self.modules["graphics"].pg_surfaces["main"].get_size(),
+            channels=3
         )
 
 
@@ -90,24 +100,16 @@ class Main:
 
     def draw(self):
 
-        # Reset main pg surface
-        self.modules["graphics"].pg_surfaces["main"].fill(color=(0,0,0,225))
+        # Clear 'main' canvas
+        self.modules["graphics"].canvases["main"].clear()
 
-        #TEST#
-        self.modules["graphics"].pg_surfaces["main"].blit(
-            source=self.modules["sprites"].spritesheets["spritesheet1"][0],
-            dest=(0,0)
-        )
-
-        # Write pg surface to mgl texture
-        self.modules["graphics"].mgl_textures["main"].write(
-            data=self.modules["graphics"].pg_surfaces["main"].get_view("1")
-        )
-
-        # Render texture to screen
+        # TESTING
+        self.modules["sprites"].spritesheets["spritesheet1"][3].shader(program=self.modules["shaders"].programs["shader"], vao=self.modules["shaders"].vaos["shader"], uniforms={"uTime": self.time})
+        self.modules["graphics"].canvases["main"].blit(source=self.modules["sprites"].spritesheets["spritesheet1"][3], pos=(100,100))
+        
+        # Blit 'main' canvas onto screen
         self.modules["graphics"].ctx.screen.use()
-        self.modules["graphics"].mgl_textures["main"].use(location=0)
-        self.modules["shaders"].programs["main"]["uTexture"] = 0
+        self.modules["graphics"].canvases["main"].use()
         self.modules["shaders"].vaos["main"].render(mode=mgl.TRIANGLE_STRIP)
 
         pg.display.flip()

@@ -22,10 +22,17 @@ class Shaders:
 
         # Load relevant shader data
         self.load_shaders(paths=(
+
+            # Engine
             r"_shaders\main.vert",
             r"_shaders\main.frag",
             r"_shaders\blit.vert",
-            r"_shaders\flip.vert"
+            r"_shaders\flip.vert",
+            r"_shaders\display.vert",
+            r'_shaders\display.frag',
+            
+            # Custom
+            r"_shaders\shader.frag"
         ))
 
         # Load nessecary moderngl resources

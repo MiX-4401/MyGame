@@ -8,8 +8,8 @@ class Graphics:
 
         self.ctx: mgl.Context = None
         self.pg_surfaces:       dict = {}
-        self.mgl_framebuffers:  dict = {}
-        self.mgl_textures:      dict = {}
+        self.canvases:          dict = {}
+        self.textures:          dict = {}
 
     def load_init(self):
 
@@ -19,25 +19,30 @@ class Graphics:
         # Enable moderngl context settings
         self.ctx.enable(mgl.BLEND)
 
-        # Create main 'mgl texture' from the main 'pg surface'
-        self.create_texture(
-            title="main", 
-            size=self.pg_surfaces["main"].get_size(), 
-            components=4, 
-            swizzle="BGRA", 
-            method=(mgl.NEAREST, mgl.NEAREST)
-        )
+        # self.canvases["main"] = Canvas.load(
+        #     size=self.pg_surfaces["main"].get_size(),
+        #     channels=3
+        # )
 
-        # Write the main 'pg surface' onto the 'mgl texture'
-        self.mgl_textures["main"].write(
-            data=self.pg_surfaces["main"].get_view("1")
-        )
+        # # Create main 'mgl texture' from the main 'pg surface'
+        # self.create_texture(
+        #     title="main", 
+        #     size=self.pg_surfaces["main"].get_size(), 
+        #     components=4, 
+        #     swizzle="BGRA", 
+        #     method=(mgl.NEAREST, mgl.NEAREST)
+        # )
 
-        # Bind the main 'mgl texture' to the 'main framebuffer'
-        self.create_framebuffer(
-            title="main", 
-            attachments=[self.mgl_textures["main"]]
-        )
+        # # Write the main 'pg surface' onto the 'mgl texture'
+        # self.mgl_textures["main"].write(
+        #     data=self.pg_surfaces["main"].get_view("1")
+        # )
+
+        # # Bind the main 'mgl texture' to the 'main framebuffer'
+        # self.create_framebuffer(
+        #     title="main", 
+        #     attachments=[self.mgl_textures["main"]]
+        # )
     
     def create_framebuffer(self, title:str, attachments:list=[]):
         self.mgl_framebuffers[title]: mgl.Framebuffer = self.ctx.framebuffer(color_attachments=attachments)
@@ -85,15 +90,17 @@ class Graphics:
 
     def garbage_cleanup(self):
 
-        for text in self.mgl_textures:
-            self.mgl_textures[text].release()
-            print(f"Graphics: releasing: {text} @ {self.mgl_textures[text]}")
+        for can in self.canvases:
+            self.canvases[can].release()
+            print(f"Graphics: releasing: {can} @ {self.canvases[can]}")
 
-        for frame in self.mgl_framebuffers:
-            self.mgl_framebuffers[frame].release()
-            print(f"Graphics: releasing: {frame} @ {self.mgl_framebuffers[frame]}")
+        for tex in self.textures:
+            self.textures[tex].release()
+            print(f"Graphics: releasing: {tex} @ {self.textures[tex]}")
 
-# 
+
+
+# Graphcis API Version 1.0
 
 class Texture:
     ctx: mgl.Context     = None
@@ -162,6 +169,9 @@ class Texture:
         self.texture.use(location=location)
 
     def sync(self):
+        pass
+
+    def release(self):
         pass
 
     def __str__(self):
@@ -288,6 +298,9 @@ class Canvas:
         if not self.synced:
             self.texture.write(data=self.framebuffer.read(components=self.channels, attachment=0))
             self.synced = True
+
+    def release(self):
+        pass
 
     def __str__(self):
         return f"Canvas Object {self.size[0]}x{self.size[1]} {self.channels}"

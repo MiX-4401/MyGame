@@ -18,9 +18,7 @@ class Sprites:
             r"_sprites\spritesheet1.png",
         })
 
-    def garbage_cleanup(self):
-        pass
-
+    
     def load_sprites(self, paths:set):
 
         # Load spritesheet surfaces
@@ -28,11 +26,11 @@ class Sprites:
 
             # Load spritesheet data
             name: str = os.path.basename(path).split(".")[0]
-            surface: Surface = Sprites.load_image_as_surface(path=path)
+            texture: Texture = Sprites.load_image_as_texture(path=path)
             tilesize: tuple = Sprites.scan_spritesheet(path=path); 
             
             # Load sprites
-            sprites: list = Sprites.split_spritesheet(spritesheet=surface, tilesize=tilesize)
+            sprites: list = Sprites.split_spritesheet(spritesheet=texture, tilesize=tilesize)
             self.spritesheets[name]: list = sprites
 
     @staticmethod
@@ -59,38 +57,45 @@ class Sprites:
         return (x+1, y+1)
     
     @staticmethod
-    def split_spritesheet(spritesheet:pg.Surface, tilesize:tuple):
+    def split_spritesheet(spritesheet:Texture, tilesize:tuple):
         
         sprites: list = []
                 
         # Find num of iterations for sprite parsing
-        spritesheet_size: tuple = spritesheet.get_size()
-        x_num_tiles = spritesheet_size[0] // tilesize[0]
-        y_num_tiles = spritesheet_size[1] // tilesize[1]
+        x_num_tiles = spritesheet.size[0] // tilesize[0]
+        y_num_tiles = spritesheet.size[1] // tilesize[1]
         
         # Sprite segmenter loop
         for y in range(y_num_tiles):
             for x in range(x_num_tiles):
  
                 # Load sprite as pg surface
-                surface: pg.Surface = pg.Surface(size=tilesize).convert_alpha()
-                surface.blit(source=spritesheet, dest=(0,0), area=(x*tilesize[0], y*tilesize[1], x*x_num_tiles+tilesize[0], y*y_num_tiles+tilesize[1]))
-                surface = Sprites.resize_surface(surface=surface, x_scale=4, y_scale=4)
+                texture: Texture = Sprites.load_blank_texture(size=tilesize)
+                texture.blit(source=spritesheet, pos=(-x * tilesize[0], -y * tilesize[1]), area=(0, 0, tilesize[0], tilesize[1]))
+                texture = Sprites.resize_surface(texture=texture, x_scale=4, y_scale=4)
                 
-                sprites.append(surface)
+                sprites.append(texture)
 
         return sprites
 
     @staticmethod
-    def load_image_as_surface(path:str):
-        # Load spritesheet as pg surface
-        return pg.image.load(path).convert_alpha()
+    def load_image_as_texture(path:str):
+        
+        # Load spritesheet as graphics.Texture
+        return Texture.load(path=path)
 
     @staticmethod
-    def resize_surface(surface:pg.Surface, x_scale:int, y_scale:int):
-        return pg.transform.scale(surface=surface, size=(surface.get_width() * x_scale, surface.get_height() * y_scale))
+    def load_blank_texture(size:tuple):
+        return Texture.load_blank(size=size, channels=4)
 
+    @staticmethod
+    def resize_surface(texture:Texture, x_scale:int, y_scale:int):
+        return Transform.scale(source=texture, size=(texture.size[0]*x_scale, texture.size[1]*y_scale))
 
+    def garbage_cleanup(self):
+        for sheet in self.spritesheets:
+            for sprite in self.spritesheets[sheet]:
+                sprite.release()
 
 
 
