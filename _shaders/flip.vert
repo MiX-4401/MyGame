@@ -3,12 +3,12 @@
 uniform bool xFlip;
 uniform bool yFlip;
 
-in vec2 aPosition;
-in vec2 aTexCoord;
+in vec2 bPos;
+in vec2 bTexCoord;
 out vec2 uvs;
 
 void main () {
-    uvs = aTexCoord;
+    uvs = bTexCoord;
 
     if (xFlip == true) {
         uvs.x = 1 - uvs.x;
@@ -18,5 +18,5 @@ void main () {
     };
     
 
-    gl_Position = vec4(aPosition, 0.0, 1.0);
+    gl_Position = vec4(bPos, 0.0, 1.0);
 }

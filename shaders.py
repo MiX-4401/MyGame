@@ -15,8 +15,7 @@ class Shaders:
             "frag": {}
         }
         
-        
-
+    
         self.init_load()
         
     def init_load(self):
@@ -24,7 +23,9 @@ class Shaders:
         # Load relevant shader data
         self.load_shaders(paths=(
             r"_shaders\main.vert",
-            r"_shaders\main.frag"
+            r"_shaders\main.frag",
+            r"_shaders\blit.vert",
+            r"_shaders\flip.vert"
         ))
 
         # Load nessecary moderngl resources

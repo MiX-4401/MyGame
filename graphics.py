@@ -1,8 +1,12 @@
 import moderngl as mgl
+import numpy as np
+from PIL import Image
+from typing import Union
 
 class Graphics:
     def __init__(self):
 
+        self.ctx: mgl.Context = None
         self.pg_surfaces:       dict = {}
         self.mgl_framebuffers:  dict = {}
         self.mgl_textures:      dict = {}

@@ -19,6 +19,7 @@ class Main:
 
         self.load_graphics()
         self.load_modules()
+        self.load_graphics_api()
 
         self.run()
 
@@ -38,6 +39,30 @@ class Main:
     def load_modules(self):
         self.modules["shaders"]: Shaders = Shaders(self.modules["graphics"].ctx)    # Load 'Shaders' module
         self.modules["sprites"]: Sprites = Sprites()                                # Load 'Sprites' module
+
+    def load_graphics_api(self):
+        
+        # Load graphics-api resources
+        self.modules["shaders"].create_program(title="blit", vert=self.modules["shaders"].shaders["vert"]["blit"], frag=self.modules["shaders"].shaders["frag"]["main"])
+        self.modules["shaders"].create_program(title="flip", vert=self.modules["shaders"].shaders["vert"]["flip"], frag=self.modules["shaders"].shaders["frag"]["main"])
+        self.modules["shaders"].create_vao(title="blit", program="blit", buffer="main", args=["2f 2f", "bPos", "bTexCoord"])
+        self.modules["shaders"].create_vao(title="flip", program="flip", buffer="main", args=["2f 2f", "bPos", "bTexCoord"])
+
+        # Load graphics-api
+        Texture.init(ctx=self.modules["graphics"].ctx, program=self.modules["shaders"].programs["blit"], vao=self.modules["shaders"].vaos["blit"])
+        Canvas.init( ctx=self.modules["graphics"].ctx, program=self.modules["shaders"].programs["blit"], vao=self.modules["shaders"].vaos["blit"])
+        Transform.init(
+            ctx=self.modules["graphics"].ctx, 
+            programs={
+                "scale": self.modules["shaders"].programs["main"],
+                "flip":  self.modules["shaders"].programs["flip"]
+            },
+            vaos={
+            "scale": self.modules["shaders"].vaos["main"],
+            "flip":  self.modules["shaders"].vaos["flip"]
+            }
+        )
+
 
     def garbage_cleanup(self):
         print("============GARBAGE=============")
