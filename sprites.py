@@ -1,7 +1,7 @@
 import os
 import pygame as pg
 from PIL import Image
-
+from graphics import Texture, Canvas, Transform
 
 class Sprites:
 
