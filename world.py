@@ -131,6 +131,7 @@ class Level:
             )
             tiles.append(tile)
 
+        # Assing
         self.tiles = tiles
 
     def load_backgrounds(self):
