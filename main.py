@@ -104,8 +104,8 @@ class Main:
         self.modules["graphics"].canvases["main"].clear()
 
         # TESTING
-        self.modules["sprites"].spritesheets["spritesheet1"][3].shader(program=self.modules["shaders"].programs["shader"], vao=self.modules["shaders"].vaos["shader"], uniforms={"uTime": self.time})
-        self.modules["graphics"].canvases["main"].blit(source=self.modules["sprites"].spritesheets["spritesheet1"][3], pos=(100,100))
+        # self.modules["sprites"].spritesheets["spritesheet1"][3].shader(program=self.modules["shaders"].programs["shader"], vao=self.modules["shaders"].vaos["shader"], uniforms={"uTime": self.time})
+        # self.modules["graphics"].canvases["main"].blit(source=self.modules["sprites"].spritesheets["spritesheet1"][3], pos=(100,100))
         
         # Blit 'main' canvas onto screen
         self.modules["graphics"].ctx.screen.use()
@@ -129,7 +129,7 @@ class Main:
                 self.garbage_cleanup()
 
 if __name__ == "__main__":
-    main: Main = Main(screen_size=(600, 500), caption="Game")
+    main: Main = Main(screen_size=(1920//1.5, 1080//1.5), caption="Game")
 
 
 

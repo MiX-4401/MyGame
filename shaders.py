@@ -21,7 +21,7 @@ class Shaders:
     def init_load(self):
 
         # Load relevant shader data
-        self.load_shaders(paths=(
+        self.load_shaders(paths={
 
             # Engine
             r"_shaders\main.vert",
@@ -33,7 +33,7 @@ class Shaders:
             
             # Custom
             r"_shaders\shader.frag"
-        ))
+        })
 
         # Load nessecary moderngl resources
         self.create_program(title="main", vert=self.shaders["vert"]["main"], frag=self.shaders["frag"]["main"])
@@ -41,7 +41,7 @@ class Shaders:
         self.create_vao(title="main", program="main", buffer="main", args=["2f 2f", "bPos", "bTexCoord"])
 
 
-    def load_shaders(self, paths:tuple):
+    def load_shaders(self, paths:set):
 
         for path in paths:            
             
