@@ -7,7 +7,7 @@ class Sprites:
 
     def __init__(self):
 
-        self.spritesheets: dict = {}
+        self.spritesheets: dict = {}        # {spritesheet1: [sprite, sprite, sprite]}
 
         self.init_load()
 
@@ -32,6 +32,9 @@ class Sprites:
             # Load sprites
             sprites: list = Sprites.split_spritesheet(spritesheet=texture, tilesize=tilesize)
             self.spritesheets[name]: list = sprites
+
+    def return_tile_texture(self, spritesheet:str, index:int):
+        return self.spritesheets[spritesheet][index]
 
     @staticmethod
     def scan_spritesheet(path:str):
