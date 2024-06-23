@@ -69,8 +69,8 @@ class Level:
         self.size: tuple = ()               # (width,height)
         self.tilesize:     tuple = ()       # (width,height)
         self.tilesets:     dict  = {}       # {bitmapid: {'spritesheet': str 'textureindex': int}}
-        self.tilelayers:   dict  = {}       # {'size': (width,height), 'type': layertype, 'bitmap': list}
-        self.objectlayers: dict  = {}       # {'size': (width,height), 'type': layertype, 'objectmap': list}
+        self.tilelayers:   dict  = {}       # {'size': (width,height), 'type': layertype, 'bitmap':    list, 'properties': [{prop: value}]}
+        self.objectlayers: dict  = {}       # {'size': (width,height), 'type': layertype, 'objectmap': list, 'properties': [{prop: value}]}
         
 
         self.backgrounds:   list = []
@@ -186,17 +186,17 @@ class Level:
 
                     # Create tile collider
                     rect = Rect(
-                        ii*self.tilesize[0],
-                        i*self.tilesize[1],
-                        self.tilesize[0],
-                        self.tilesize[1]
+                        ii*self.tilesize[0]*3,
+                        i*self.tilesize[1]*3,
+                        self.tilesize[0]*3,
+                        self.tilesize[1]*3
                     ) 
 
                     # Create tile
                     tile: Tile = Tile(
                         layer_id=layerid,
                         size=self.tilesize,
-                        pos=[ii*self.tilesize[0]*4, i*self.tilesize[1]*4],
+                        pos=[ii*self.tilesize[0]*3, i*self.tilesize[1]*3],
                         textures=[self.SPRITEMODULE.return_tile_texture(spritesheet=self.tilesets[x]["spritesheet"], index=self.tilesets[x]["texture_index"])],
                         rect=rect if layerid == "1" else None,
                         properties={}
@@ -224,32 +224,61 @@ class Level:
         pass
 
     def load_graphics(self):
+        graphics: Graphics = self.GRAPHICSMODULE
+
+        # Register canvases
         for lay in self.tilelayers:
-            self.GRAPHICSMODULE.register_canvas(name=lay, size=self.GRAPHICSMODULE.canvases["main"].size, channels=4)
+            graphics.register_canvas(name=lay, size=graphics.canvases["main"].size, channels=4)
+
+        # Draw tiles onto static canvases
+        for layerid in self.tiles:
+            
+            # Get render target (canvas) & list of tiles
+            canvas     = graphics.canvases[layerid]
+            tiles      = self.tiles[layerid]
+            properties = self.tilelayers[layerid]["properties"]
+
+            # Skip non-static layers
+            if properties["draw_static"] == False: continue
+
+            # Blit tiles onto static-canvas
+            for til in tiles:
+                canvas.blit(
+                    source=til.get_frame(), 
+                    pos=til.pos
+                )
+
+
 
 #self.tilelayers[lay]["size"][0]*self.tilesize[0]*4, self.tilelayers[lay]["size"][1]*self.tilesize[1]*4
     def update(self):
         pass
 
     def draw(self):
-        
+
         graphics: Graphics = self.GRAPHICSMODULE
 
-        # Draw tiles onto canvases
+        # Draw tiles onto non-static canvases
         for layerid in self.tiles:
             
             # Get render target (canvas) & list of tiles
-            canvas = graphics.canvases[layerid]
-            tiles  = self.tiles[layerid]
+            canvas     = graphics.canvases[layerid]
+            tiles      = self.tiles[layerid]
+            properties = self.tilelayers[layerid]["properties"]
+
+            # Skip static layers
+            if properties["draw_static"] == True: continue
 
             # Blit tiles onto canvas
             for til in tiles:
                 canvas.blit(
-                    source=til.get_frame(),
+                    source=til.get_frame(), 
                     pos=til.pos
                 )
         
-            graphics.draw(destination="main", source=layerid, pos=(0,0))
+        # Draw canvases
+        for canvasid in graphics.canvases:
+            graphics.draw(destination="main", source=canvasid, pos=(0,0))
 
     def garbage_cleanup(self):
         pass

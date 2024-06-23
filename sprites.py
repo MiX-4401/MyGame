@@ -77,7 +77,7 @@ class Sprites:
                 # Load sprite as pg surface
                 texture: Texture = Sprites.load_blank_texture(size=tilesize)
                 texture.blit(source=spritesheet, pos=(-x * tilesize[0], -y * tilesize[1]), area=(0, 0, tilesize[0], tilesize[1]))
-                texture = Sprites.resize_surface(texture=texture, x_scale=4, y_scale=4)
+                texture = Sprites.resize_surface(texture=texture, x_scale=3, y_scale=3)
                 
                 sprites.append(texture)
 

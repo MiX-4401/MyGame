@@ -109,8 +109,6 @@ class Main:
         # self.modules["sprites"].spritesheets["spritesheet1"][3].shader(program=self.modules["shaders"].programs["shader"], vao=self.modules["shaders"].vaos["shader"], uniforms={"uTime": self.time})
         # self.modules["graphics"].canvases["main"].blit(source=self.modules["sprites"].spritesheets["spritesheet1"][0], pos=(64,0))
         self.modules["world"].current_level.draw()
-        # self.modules["graphics"].canvases["main"].blit(source=self.modules["world"].current_level.tiles[1][0].textures[0], pos=(0,0))
-
 
 
         # Blit 'main' canvas onto screen
