@@ -1,0 +1,2 @@
+Texture scaling, tile positions, canvas size relies on hard-coded scale factor
+Occurences found in: sprites, world 
