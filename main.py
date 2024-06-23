@@ -3,8 +3,9 @@ import moderngl as mgl
 import traceback as trace
 from sys import exit
 from graphics import *
-from shaders import *
-from sprites import *
+from shaders  import *
+from sprites  import *
+from world    import *
 
 class Main:
     def __init__(self, screen_size:tuple, caption:str):
@@ -39,9 +40,10 @@ class Main:
         self.modules["graphics"].load_init()
 
     def load_modules(self):
-        self.modules["shaders"]: Shaders = Shaders(self.modules["graphics"].ctx)    # Load 'Shaders' module
+        self.modules["shaders"]: Shaders = Shaders(self.modules["graphics"].ctx)                                                 # Load 'Shaders' module
         self.load_graphics_api()
-        self.modules["sprites"]: Sprites = Sprites()                                # Load 'Sprites' module
+        self.modules["sprites"]: Sprites = Sprites()                                                                         # Load 'Sprites' module
+        self.modules["world"]:   World   = World(SpriteModule=self.modules["sprites"], GraphicsModule=self.modules["graphics"])  # Load 'World' module
 
     def load_graphics_api(self):
         
@@ -105,8 +107,12 @@ class Main:
 
         # TESTING
         # self.modules["sprites"].spritesheets["spritesheet1"][3].shader(program=self.modules["shaders"].programs["shader"], vao=self.modules["shaders"].vaos["shader"], uniforms={"uTime": self.time})
-        # self.modules["graphics"].canvases["main"].blit(source=self.modules["sprites"].spritesheets["spritesheet1"][3], pos=(100,100))
-        
+        # self.modules["graphics"].canvases["main"].blit(source=self.modules["sprites"].spritesheets["spritesheet1"][0], pos=(64,0))
+        self.modules["world"].current_level.draw()
+        # self.modules["graphics"].canvases["main"].blit(source=self.modules["world"].current_level.tiles[1][0].textures[0], pos=(0,0))
+
+
+
         # Blit 'main' canvas onto screen
         self.modules["graphics"].ctx.screen.use()
         self.modules["graphics"].canvases["main"].use()

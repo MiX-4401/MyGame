@@ -8,6 +8,7 @@ class Sprites:
     def __init__(self):
 
         self.spritesheets: dict = {}        # {spritesheet1: [sprite, sprite, sprite]}
+        self.scale_factor = 4
 
         self.init_load()
 
@@ -16,6 +17,7 @@ class Sprites:
         # Load relevant spritesheets
         self.load_sprites(paths={
             r"_sprites\spritesheet1.png",
+            r"_sprites\spritesheet2.png"
         })
 
     
@@ -85,7 +87,7 @@ class Sprites:
     def load_image_as_texture(path:str):
         
         # Load spritesheet as graphics.Texture
-        return Texture.load(path=path)
+        return Transform.flip(source=Texture.load(path=path), y_flip=False)
 
     @staticmethod
     def load_blank_texture(size:tuple):

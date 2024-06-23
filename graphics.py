@@ -88,6 +88,13 @@ class Graphics:
 
         return framebuffer
 
+    def register_canvas(self, name:str, size:tuple, channels:int=4):
+        self.canvases[name] = Canvas.load(size=size, channels=channels)
+
+    def unregister_canvas(self, name:str):
+        self.canvases[name].release()
+        self.canvases.pop(name)
+
     def garbage_cleanup(self):
 
         for can in self.canvases:
@@ -98,6 +105,10 @@ class Graphics:
             self.textures[tex].release()
             print(f"Graphics: releasing: {tex} @ {self.textures[tex]}")
 
+
+    def draw(self, destination:str, source:str, pos:tuple, area:tuple=None):
+        self.canvases[destination].blit(source=self.canvases[source], pos=pos, area=area)
+        
 
 
 # Graphcis API Version 1.0
@@ -317,6 +328,8 @@ class Canvas:
 
     @staticmethod
     def load(size:tuple, channels:int=4):
+        """Returns a Cavnas type object"""
+
         ctx, program, vao = Canvas.get_components() 
 
         canvas: Canvas = Canvas()

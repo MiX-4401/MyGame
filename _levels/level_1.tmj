@@ -16,6 +16,12 @@
          "id":1,
          "name":"Tile Layer 1",
          "opacity":1,
+         "properties":[
+                {
+                 "name":"draw_static",
+                 "type":"bool",
+                 "value":true
+                }],
          "type":"tilelayer",
          "visible":true,
          "width":8,
@@ -23,29 +29,32 @@
          "y":0
         }, 
         {
-         "draworder":"topdown",
-         "id":2,
-         "name":"Object Layer 1",
-         "objects":[
-                {
-                 "gid":2,
-                 "height":16,
-                 "id":1,
-                 "name":"thing",
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":16,
-                 "x":0,
-                 "y":32
-                }],
+         "data":[1, 1, 1, 1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1, 1, 1, 1,
+            0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0],
+         "height":9,
+         "id":5,
+         "name":"Tile Layer 2",
          "opacity":1,
-         "type":"objectgroup",
+         "properties":[
+                {
+                 "name":"draw_static",
+                 "type":"bool",
+                 "value":true
+                }],
+         "type":"tilelayer",
          "visible":true,
+         "width":8,
          "x":0,
          "y":0
         }],
- "nextlayerid":3,
+ "nextlayerid":6,
  "nextobjectid":3,
  "orientation":"orthogonal",
  "renderorder":"right-down",

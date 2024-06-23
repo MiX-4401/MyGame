@@ -9,12 +9,13 @@ class World:
         
         self.SPRITEMODULE:   Sprites  = SpriteModule
         self.GRAPHICSMODULE: Graphics = GraphicsModule
-        self.level_data: dict = {}
+        self.level_data:    dict  = {}
         self.current_level: Level = None
 
         self.init_load()
 
         self.load_level(level_name="level_1")
+        self.level_start()
         
     def init_load(self):
         
@@ -49,6 +50,12 @@ class World:
 
         self.current_level = level
 
+    def level_start(self):
+        self.current_level.init_load()
+
+    def garbage_cleanup(self):
+        self.current_level.garbage_cleanup()
+        
 
 class Level:
     def __init__(self, WorldModule: World, SpriteModule: Sprites, GraphicsModule: Graphics, level_data:dict):
@@ -68,7 +75,7 @@ class Level:
 
         self.backgrounds:   list = []
         self.shaders:       list = []
-        self.tiles:         list = []
+        self.tiles:         dict = {}       # {layerid: [tile1, tile2, tile3]}
         self.entities:      list = []
         self.players:       list = []
         self.lights:        list = []
@@ -89,6 +96,11 @@ class Level:
 
     def init_load(self):
         self.load_information()
+        self.load_tilelayers()
+        self.load_objectlayers()
+        self.load_tilesets()
+        self.load_tiles()
+        self.load_graphics()
 
     
     def load_information(self):
@@ -110,14 +122,15 @@ class Level:
         tilelayers: dict = {}
         for lay in self.level_data["layers"]:
             if lay["type"] != "tilelayer": continue
+            
+            layertype:  str   = lay["type"]
+            layerid:    int   = lay["id"]
+            layersize:  tuple = (lay["width"], lay["height"])
+            bitmap:     dict  = lay["data"]
+            properties: dict  = {prop["name"]: prop["value"] for prop in lay["properties"]}
 
-            layertype: str    = lay["type"]
-            layerid:   int    = lay["id"]
-            layersize: tuple  = (lay["width"], lay["height"])
-            bitmap:     dict  = lay["bitmap"]
-
-            bitmap = Level.convert_bitmap_1d_to_2d(bitmap=bitmap, size=size)
-            tilelayers[layerid] = {"size": layersize, "type": layertype, "bitmap": bitmap}
+            bitmap = Level.convert_bitmap_1d_to_2d(bitmap=bitmap, size=layersize)
+            tilelayers[layerid] = {"size": layersize, "type": layertype, "bitmap": bitmap, "properties": properties}
             
         self.tilelayers = tilelayers
 
@@ -131,15 +144,14 @@ class Level:
 
             layertype: str    = lay["type"]
             layerid:   int    = lay["id"]
-            layersize: tuple  = (lay["width"], lay["height"])
             objectmap:  dict  = lay["objects"]
 
-            objectlayers[layerid] = {"size": layersize, "type": layertype, "objectmap": objectmap}
+            objectlayers[layerid] = {"type": layertype, "objectmap": objectmap}
 
         self.objectlayers = objectlayers
 
     def load_tilesets(self):
-        
+
         # Get tilesets
         tilesets: dict = {}         
         for til in self.level_data["tilesets"]:
@@ -154,33 +166,44 @@ class Level:
                     "spritesheet":  source,
                     "texture_index": textureindex
                 }
+        
+        self.tilesets = tilesets
 
     def load_tiles(self):
 
         # {"size": size, "type": _type, "bitmap": bitmap}
-        tiles: list = []
+        tiles: dict = {}
         for layerid in self.tilelayers:
+            tiles[layerid]: list = []
 
             bitmap: list = self.tilelayers[layerid]["bitmap"]
 
+            # FOR each tile appearing on the bitmap
             for i,y in enumerate(bitmap):
-                for ii,x in enumerate(bitmap):
+                for ii,x in enumerate(y):
                     
+                    if x == 0: continue
+
+                    # Create tile collider
                     rect = Rect(
-                        left=ii*self.tilesize[0],
-                        top=i*self.tilesize[1],
-                        width=self.tilesize[0],
-                        height=self.tilesize[1]
+                        ii*self.tilesize[0],
+                        i*self.tilesize[1],
+                        self.tilesize[0],
+                        self.tilesize[1]
                     ) 
 
+                    # Create tile
                     tile: Tile = Tile(
+                        layer_id=layerid,
                         size=self.tilesize,
-                        pos=[ii*self.tilesize[0], i*self.tilesize[1]],
-                        textures=self.SPRITEMODULE.return_tile_texture(spritesheet=self.tilesets[x]["spritesheet"], index=self.tilesets[x]["texture_index"]),
+                        pos=[ii*self.tilesize[0]*4, i*self.tilesize[1]*4],
+                        textures=[self.SPRITEMODULE.return_tile_texture(spritesheet=self.tilesets[x]["spritesheet"], index=self.tilesets[x]["texture_index"])],
                         rect=rect if layerid == "1" else None,
                         properties={}
                     )
-            tiles.append(tile)
+
+                    # Add tile to list
+                    tiles[layerid].append(tile)
 
         # Assign
         self.tiles = tiles
@@ -201,20 +224,47 @@ class Level:
         pass
 
     def load_graphics(self):
-        for i in range(len(self.tilelayers)):
-            self.GRAPHICSMODULE.register_canvas()
+        for lay in self.tilelayers:
+            self.GRAPHICSMODULE.register_canvas(name=lay, size=self.GRAPHICSMODULE.canvases["main"].size, channels=4)
 
+#self.tilelayers[lay]["size"][0]*self.tilesize[0]*4, self.tilelayers[lay]["size"][1]*self.tilesize[1]*4
+    def update(self):
+        pass
 
+    def draw(self):
+        
+        graphics: Graphics = self.GRAPHICSMODULE
+
+        # Draw tiles onto canvases
+        for layerid in self.tiles:
+            
+            # Get render target (canvas) & list of tiles
+            canvas = graphics.canvases[layerid]
+            tiles  = self.tiles[layerid]
+
+            # Blit tiles onto canvas
+            for til in tiles:
+                canvas.blit(
+                    source=til.get_frame(),
+                    pos=til.pos
+                )
+        
+            graphics.draw(destination="main", source=layerid, pos=(0,0))
+
+    def garbage_cleanup(self):
+        pass
 
 class Tile:
-    def __init__(self, size:tuple, pos:tuple, textures:list, rect:Rect, properties:dict):
+    def __init__(self, layer_id:int, size:tuple, pos:tuple, textures:list, rect:Rect, properties:dict):
         
+        self.layer_id:   int   = layer_id
         self.size:       tuple = size
         self.pos:        tuple = pos
         self.textures:   list  = textures
         self.rect:       Rect  = rect
         self.properties: dict  = properties
 
+        self.current_frame: int = 0
 
     def update(self):
         pass
@@ -233,6 +283,11 @@ class Tile:
 
     def move(self):
         pass
+
+    def get_frame(self):
+        """Returns the current animated texture frame"""
+
+        return self.textures[self.current_frame]
 
 
 
