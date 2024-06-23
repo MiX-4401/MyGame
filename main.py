@@ -107,7 +107,16 @@ class Main:
 
         # TESTING
         # self.modules["sprites"].spritesheets["spritesheet1"][3].shader(program=self.modules["shaders"].programs["shader"], vao=self.modules["shaders"].vaos["shader"], uniforms={"uTime": self.time})
-        # self.modules["graphics"].canvases["main"].blit(source=self.modules["sprites"].spritesheets["spritesheet1"][0], pos=(64,0))
+        # self.modules["graphics"].canvases[2].shader(
+        #     program=self.modules["shaders"].programs["shader"],
+        #     vao=self.modules["shaders"].vaos["shader"],
+        #     uniforms={"uTime": self.time}
+        # )
+        # self.modules["sprites"].spritesheets["spritesheet1"][2].shader(
+        #     program=self.modules["shaders"].programs["shader"],
+        #     vao=self.modules["shaders"].vaos["shader"],
+        #     uniforms={"uTime": self.time}
+        # )
         self.modules["world"].current_level.draw()
 
 

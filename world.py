@@ -127,10 +127,11 @@ class Level:
             layerid:    int   = lay["id"]
             layersize:  tuple = (lay["width"], lay["height"])
             bitmap:     dict  = lay["data"]
+            offset:     tuple = (lay["offsetx"]*2*-1, lay["offsety"]*2*-1) if "offsetx" in lay else (0, 0)
             properties: dict  = {prop["name"]: prop["value"] for prop in lay["properties"]}
 
             bitmap = Level.convert_bitmap_1d_to_2d(bitmap=bitmap, size=layersize)
-            tilelayers[layerid] = {"size": layersize, "type": layertype, "bitmap": bitmap, "properties": properties}
+            tilelayers[layerid] = {"size": layersize, "offset": offset, "type": layertype, "bitmap": bitmap, "properties": properties}
             
         self.tilelayers = tilelayers
 
@@ -278,7 +279,8 @@ class Level:
         
         # Draw canvases
         for canvasid in graphics.canvases:
-            graphics.draw(destination="main", source=canvasid, pos=(0,0))
+            offset = self.tilelayers[canvasid]["offset"] if canvasid != "main" else (0,0) 
+            graphics.draw(destination="main", source=canvasid, pos=offset)
 
     def garbage_cleanup(self):
         pass
