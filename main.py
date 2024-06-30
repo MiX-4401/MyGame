@@ -1,16 +1,16 @@
-import pygame   as pg
-import moderngl as mgl
+import pygame    as pg
+import moderngl  as mgl
 import traceback as trace
+from graphics import Graphics, Texture, Canvas, Transform
+from shaders  import Shaders
+from sprites  import Sprites
+from world    import World
 from sys import exit
-from graphics import *
-from shaders  import *
-from sprites  import *
-from world    import *
 
 class Main:
-    def __init__(self, screen_size:tuple, caption:str):
-        self.screen_size: tuple = screen_size
-        self.caption:     str   = caption
+    def __init__(self, screen_size:tuple, sprite_scale_factor:int, caption:str):
+        self.screen_size:         tuple = screen_size
+        self.caption:             str   = caption
 
         self.pg_clocks:    dict = {}
         self.modules:      dict = {}
@@ -19,7 +19,7 @@ class Main:
         self.fps:  int = 0
 
         self.load_graphics()
-        self.load_modules()
+        self.load_modules(sprite_scale_factor=sprite_scale_factor)
         
         self.modules["shaders"].create_program(title="shader", vert=self.modules["shaders"].shaders["vert"]["main"], frag=self.modules["shaders"].shaders["frag"]["shader"])
         self.modules["shaders"].create_vao(title="shader", program="shader", buffer="main", args=["2f 2f", "bPos", "bTexCoord"])
@@ -39,10 +39,10 @@ class Main:
         # Moderngl Boilerplate
         self.modules["graphics"].load_init()
 
-    def load_modules(self):
+    def load_modules(self, sprite_scale_factor:int):
         self.modules["shaders"]: Shaders = Shaders(self.modules["graphics"].ctx)                                                 # Load 'Shaders' module
         self.load_graphics_api()
-        self.modules["sprites"]: Sprites = Sprites()                                                                         # Load 'Sprites' module
+        self.modules["sprites"]: Sprites = Sprites(scale_factor=sprite_scale_factor)                                                                         # Load 'Sprites' module
         self.modules["world"]:   World   = World(SpriteModule=self.modules["sprites"], GraphicsModule=self.modules["graphics"])  # Load 'World' module
 
     def load_graphics_api(self):
@@ -142,7 +142,7 @@ class Main:
                 self.garbage_cleanup()
 
 if __name__ == "__main__":
-    main: Main = Main(screen_size=(1920//1.5, 1080//1.5), caption="Game")
+    main: Main = Main(screen_size=(1920//1.5, 1080//1.5), sprite_scale_factor=3, caption="Game")
 
 
 

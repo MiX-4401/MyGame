@@ -5,10 +5,10 @@ from graphics import Texture, Canvas, Transform
 
 class Sprites:
 
-    def __init__(self):
+    def __init__(self, scale_factor:int):
 
+        self.scale_factor: int  = scale_factor
         self.spritesheets: dict = {}        # {spritesheet1: [sprite, sprite, sprite]}
-        self.scale_factor = 4
 
         self.init_load()
 
@@ -17,7 +17,7 @@ class Sprites:
         # Load relevant spritesheets
         self.load_sprites(paths={
             r"_sprites\spritesheet1.png",
-            r"_sprites\spritesheet2.png"
+            r"_sprites\rocks.png"
         })
 
     
@@ -32,7 +32,7 @@ class Sprites:
             tilesize: tuple = Sprites.scan_spritesheet(path=path); 
             
             # Load sprites
-            sprites: list = Sprites.split_spritesheet(spritesheet=texture, tilesize=tilesize)
+            sprites: list = Sprites.split_spritesheet(spritesheet=texture, tilesize=tilesize, scale_factor=self.scale_factor)
             self.spritesheets[name]: list = sprites
 
     def return_tile_texture(self, spritesheet:str, index:int):
@@ -62,7 +62,7 @@ class Sprites:
         return (x+1, y+1)
     
     @staticmethod
-    def split_spritesheet(spritesheet:Texture, tilesize:tuple):
+    def split_spritesheet(spritesheet:Texture, tilesize:tuple, scale_factor:int):
         
         sprites: list = []
                 
@@ -77,7 +77,7 @@ class Sprites:
                 # Load sprite as pg surface
                 texture: Texture = Sprites.load_blank_texture(size=tilesize)
                 texture.blit(source=spritesheet, pos=(-x * tilesize[0], -y * tilesize[1]), area=(0, 0, tilesize[0], tilesize[1]))
-                texture = Sprites.resize_surface(texture=texture, x_scale=3, y_scale=3)
+                texture = Sprites.resize_surface(texture=texture, x_scale=scale_factor, y_scale=scale_factor)
                 
                 sprites.append(texture)
 
