@@ -2,14 +2,14 @@ from pygame   import Rect
 from graphics import Texture
 
 class Tile:
-    def __init__(self, layer_id:int, size:tuple, pos:tuple, textures:list, rect:Rect, properties:dict):
+    def __init__(self, layer_id:int, tile_size:tuple, tile_pos:tuple, tile_textures:list, tile_rect:Rect, tile_properties:dict):
         
         self.layer_id:   int   = layer_id
-        self.size:       tuple = size
-        self.pos:        tuple = pos
-        self.textures:   list  = textures
-        self.rect:       Rect  = rect
-        self.properties: dict  = properties
+        self.size:       tuple = tile_size
+        self.pos:        tuple = tile_pos
+        self.textures:   list  = tile_textures
+        self.rect:       Rect  = tile_rect
+        self.properties: dict  = tile_properties
 
         self.current_frame: int = 0
 

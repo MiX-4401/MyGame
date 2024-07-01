@@ -14,6 +14,7 @@ class World:
 
         self.init_load()
 
+        # TESTING
         self.load_level(level_name="level_1")
         self.level_start()
         

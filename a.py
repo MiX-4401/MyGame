@@ -29,12 +29,17 @@
 
 # print(sets)
 
-a = []
-a.append(1)
-a.append(2)
-a.append(3)
+class A:
+    b = 1
 
-for x in a:
-    print(x)
+class C():
+    def __init__(self):
+        print(A.b)
+
+
+
+
+cl = C()
+
 
 

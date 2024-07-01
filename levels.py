@@ -18,21 +18,44 @@ class Level:
         self.name:       str   = ""             # level displayname <string>
         self.size:       tuple = ()             # (width,height)
         self.tilesize:   tuple = ()             # (width,height)
+        self.tilesets:   dict  = {}
         self.layers:     list  = []             # [layer1, layer2, layer3]      
-
+    
 
     def init_load(self):
         self.load_information(data=self.level_data)
         self.load_tilelayers(data=self.level_data["layers"])
         self.load_imagelayers(data=self.level_data["layers"])
         self.load_entitylayers(data=self.level_data["layers"])
+        self.load_lightinglayers(data=self.level_data["layers"])
     
+
     def load_information(self, data:dict):
         """Load basic level information"""
 
         self.name     = ""
         self.size     = (data["width"], data["height"])
         self.tilesize = (data["tilewidth"], data["tileheight"])
+
+
+    def load_tilesets(self, data:dict):
+        """Loads tilesets"""
+
+        tilesets: dict = {}         
+        for til in data["tilesets"]:
+            firstgrid: int = til["firstgid"]
+            source:    str = til["source"].split("/")[-1].split(".")[0]     # eg: "..\/_sprites\/spritesheet1.tsx" to "spritesheet1"   
+            
+            spritesheet: list = self.SPRITEMODULE.spritesheets[source]
+
+            # Match the level bitmap tile id with a spritesheet texture index
+            for textureindex,bitmapid in enumerate([e for e in range(firstgrid + len(spritesheet))][firstgrid::]):
+                tilesets[bitmapid] = {
+                    "spritesheet":  source,
+                    "texture_index": textureindex
+                }
+        
+        self.tilesets = tilesets
 
 
     def load_tilelayers(self, data:list):
@@ -48,10 +71,10 @@ class Level:
 
             # Get tilelayer information
             layer_id:         int   = layer["id"]
-            layer_name:       str = layer["name"]
+            layer_name:       str   = layer["name"]
             layer_size:       tuple = (layer["width"], layer["height"])
-            layer_offset:     tuple = (layer["offsetx"]*self.SPRITEMODULE.scale_factor*-1, layer["offsety"]*self.SPRITEMODULE.scale_factor*-1) if "offsetx" in lay else (0, 0)
-            layer_bitmap:     list  = Level.convert_bitmap_1d_to_2d(bitmap=layer["bitmap"], size=layersize)
+            layer_offset:     tuple = (layer["offsetx"]*self.SPRITEMODULE.scale_factor*-1, layer["offsety"]*self.SPRITEMODULE.scale_factor*-1) if "offsetx" in layer else (0, 0)
+            layer_bitmap:     list  = layer["bitmap"]
             layer_properties: dict  = {prop["name"]: prop["value"] for prop in layer["properties"]} if "properties" in layer else {}
 
 
@@ -62,7 +85,8 @@ class Level:
                 layer_size=layer_size,
                 layer_offset=layer_offset,
                 layer_bitmap=layer_bitmap,
-                layer_properties=layer_properties
+                layer_properties=layer_properties,
+                tile_size=self.tilesize
             )
 
             tile_layers.append(tilelayer)
@@ -105,7 +129,9 @@ class Level:
 
 
     def load_entitylayers(self, data:list):
-        
+        """Load a list of entitylayers in the level"""
+
+
         entity_layers: list = []
         for layer in data["layers"]:
 
@@ -135,7 +161,9 @@ class Level:
 
 
     def load_lightinglayers(self):
-        
+        """Load a list of lightinglayers in the level"""
+
+
         lighting_layers: list = []
         for layer in data["layers"]:
 
@@ -162,11 +190,8 @@ class Level:
 
 
 
-
-
-
-    def load_entitylayers(self):
-        pass
-
     def load_colliderlayers(self):
         pass
+
+
+
