@@ -2,27 +2,29 @@
 
 class CloseScene:
     def __init__(self):
-        pass
+        self.imagelayers: list = []
 
 
 class CentreScene:
     def __init__(self):
-        pass
+        self.tilelayers:     list = []
+        self.collidelayers:  list = []
+        self.lightinglayers: list = []
 
 
 class NearScene:
     def __init__(self):
-        pass
+        self.tilelayers: list = []
 
 
 class FarScene:
     def __init__(self):
-        pass
-
+        self.imagelayers: list = []
+        
 
 class DistanceScene:
     def __init__(self):
-        pass
+        self.imagelayers: list = []
 
 
 
