@@ -2,19 +2,19 @@ from tiles  import Tile
 from pygame import Rect
 
 
-
 class TileLayer:
     tilesets: dict = {}
 
-    def __init__(self, tile_size:tuple, layer_name:str, layer_id:int, layer_size:tuple, layer_offset:tuple, layer_bitmap:list, layer_properties:dict):
+    def __init__(self, master_level, tile_size:tuple, layer_name:str, layer_id:int, layer_size:tuple, layer_offset:tuple, layer_bitmap:list, layer_properties:dict):
+        self.master            = master_level
         self.name:       str   = layer_name
-        self.id:         int   = layer_id,
+        self.id:         int   = layer_id
         self.size:       tuple = layer_size
         self.offset:     tuple = layer_offset
         self.bitmap:     list  = layer_bitmap
         self.properties: dict  = layer_properties
-        
-        self.tilesize:  tuple = tile_size
+        self.tilesize:   tuple = tile_size
+         
         self.tiles:     list  = []
 
     def load_init(self):
@@ -24,6 +24,8 @@ class TileLayer:
 
     def load_tiles(self):
         """Loads tiles into self.tile variable"""
+        SPRITEMODULE = self.master.SPRITEMODULE
+
 
         tiles: list = [] 
 
@@ -35,18 +37,18 @@ class TileLayer:
 
                 # Create tile collider
                 rect = Rect(
-                    ii*self.tilesize[0]*self.SPRITEMODULE.scale_factor,
-                    i*self.tilesize[1]*self.SPRITEMODULE.scale_factor,
-                    self.tilesize[0]*self.SPRITEMODULE.scale_factor,
-                    self.tilesize[1]*self.SPRITEMODULE.scale_factor
+                    ii*self.tilesize[0]*SPRITEMODULE.scale_factor,
+                    i*self.tilesize[1]*SPRITEMODULE.scale_factor,
+                    self.tilesize[0]*SPRITEMODULE.scale_factor,
+                    self.tilesize[1]*SPRITEMODULE.scale_factor
                 ) 
 
                 # Create tile
                 tile: Tile = Tile(
                     layer_id=self.id,
                     tile_size=self.tilesize,
-                    tile_pos=[ii*self.tilesize[0]*self.SPRITEMODULE.scale_factor, i*self.tilesize[1]*self.SPRITEMODULE.scale_factor],
-                    tile_textures=[self.SPRITEMODULE.return_tile_texture(spritesheet=TileLayer.tilesets[x]["spritesheet"], index=TileLayer.tilesets[x]["texture_index"])],
+                    tile_pos=[ii*self.tilesize[0]*SPRITEMODULE.scale_factor, i*self.tilesize[1]*SPRITEMODULE.scale_factor],
+                    tile_textures=[SPRITEMODULE.return_tile_texture(spritesheet=TileLayer.tilesets[x]["spritesheet"], index=TileLayer.tilesets[x]["texture_index"])],
                     tile_rect=rect if layerid == "1" else None,
                     tile_properties={}
                 )
@@ -71,7 +73,8 @@ class TileLayer:
 
 
 class ImageLayer:
-    def __init__(self, layer_name:str, layer_id:int, layer_image_path:str, layer_offset:tuple, layer_pallerax:tuple, layer_properties:dict):
+    def __init__(self, master_level, layer_name:str, layer_id:int, layer_image_path:str, layer_offset:tuple, layer_pallerax:tuple, layer_properties:dict):
+        self.master             = master_level
         self.name:        str   = layer_name
         self.id:          int   = layer_id
         self.image_path:  str   = layer_image_path
@@ -81,7 +84,8 @@ class ImageLayer:
 
 
 class EntityLayer:
-    def __init__(self, layer_name:str, layer_id:int, layer_entities:list, layer_properties:dict):
+    def __init__(self, master_level, layer_name:str, layer_id:int, layer_entities:list, layer_properties:dict):
+        self.master           = master_level
         self.name:       str  = layer_name
         self.id:         int  = layer_id
         self.entities:   list = layer_entities
@@ -89,7 +93,8 @@ class EntityLayer:
 
 
 class LightingLayer:
-    def __init__(self, layer_name:str, layer_id:int, layer_lights:list, layer_properties:dict):
+    def __init__(self, master_level, layer_name:str, layer_id:int, layer_lights:list, layer_properties:dict):
+        self.master           = master_level
         self.name:       str  = layer_name
         self.id:         int  = layer_id
         self.lights:     list = layer_lights

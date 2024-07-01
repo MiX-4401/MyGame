@@ -80,6 +80,7 @@ class Level:
 
             # Load tilelayer
             tilelayer: TileLayer = TileLayer(
+                master_level=self,
                 layer_name=layer_name,
                 layer_id=layer_id, 
                 layer_size=layer_size,
@@ -115,6 +116,7 @@ class Level:
 
             # Load ImageLayer
             imagelayer: ImageLayer = ImageLayer(
+                master_level=self,
                 layer_name=layer_name,
                 layer_id=layer_id,
                 layer_image_path=layer_image_path,
@@ -149,6 +151,7 @@ class Level:
 
             # Load objectlayer
             entitylayer: EntityLayer = EntityLayer(
+                master_level=self,
                 layer_name=layer_name,
                 layer_id=layer_id,
                 layer_entities=layer_entities,
@@ -160,7 +163,7 @@ class Level:
         self.layers.extend(entity_layers)
 
 
-    def load_lightinglayers(self):
+    def load_lightinglayers(self, data:list):
         """Load a list of lightinglayers in the level"""
 
 
@@ -177,11 +180,15 @@ class Level:
             layer_name:       str  = layer["name"]
             layer_lights:     list = layer["objects"]
             layer_properties: dict = {prop["name"]: prop["value"] for prop in layer["properties"]} if "properties" in layer else {}
-
+            
 
             # Load lightinglayer
             lightinglayer: LightingLayer = LightingLayer(
-                
+                master_level=self,
+                layer_name=layer_name,
+                layer_id=layer_id,
+                layer_lights=layer_lights,
+                layer_properties=layer_properties
             )
 
             lighting_layers.append(lightinglayer)
@@ -190,7 +197,7 @@ class Level:
 
 
 
-    def load_colliderlayers(self):
+    def load_colliderlayers(self, data:list):
         pass
 
 
