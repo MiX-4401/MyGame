@@ -18,16 +18,17 @@ class Level:
         self.name:       str   = ""             # level displayname <string>
         self.size:       tuple = ()             # (width,height)
         self.tilesize:   tuple = ()             # (width,height)
-        self.tilesets:   dict  = {}
         self.layers:     list  = []             # [layer1, layer2, layer3]      
     
 
     def init_load(self):
         self.load_information(data=self.level_data)
+        self.load_tilesets(data=self.level_data)
         self.load_tilelayers(data=self.level_data["layers"])
         self.load_imagelayers(data=self.level_data["layers"])
         self.load_entitylayers(data=self.level_data["layers"])
         self.load_lightinglayers(data=self.level_data["layers"])
+        self.load_graphics()
     
 
     def load_information(self, data:dict):
@@ -41,21 +42,24 @@ class Level:
     def load_tilesets(self, data:dict):
         """Loads tilesets"""
 
-        tilesets: dict = {}         
+
+        tilesets: dict = {}     # {bitmapid: (spritesheet <str> textureindex <int>)}
         for til in data["tilesets"]:
+
+            # Get tileset information relating to level
             firstgrid: int = til["firstgid"]
             source:    str = til["source"].split("/")[-1].split(".")[0]     # eg: "..\/_sprites\/spritesheet1.tsx" to "spritesheet1"   
             
-            spritesheet: list = self.SPRITEMODULE.spritesheets[source]
+            # Get number of tiles within of spritesheet
+            length: int = len(self.SPRITEMODULE.spritesheets[source])
 
             # Match the level bitmap tile id with a spritesheet texture index
-            for textureindex,bitmapid in enumerate([e for e in range(firstgrid + len(spritesheet))][firstgrid::]):
-                tilesets[bitmapid] = {
-                    "spritesheet":  source,
-                    "texture_index": textureindex
-                }
+            for textureindex,bitmapid in enumerate([e for e in range(firstgrid + length)][firstgrid::]):
+                tilesets[bitmapid] = (source, textureindex)
         
-        self.tilesets = tilesets
+
+        # Hand tileset information to layers
+        TileLayer.tilesets = tilesets
 
 
     def load_tilelayers(self, data:list):
@@ -196,9 +200,10 @@ class Level:
         self.layers.extend(lighting_layer)
 
 
-
     def load_colliderlayers(self, data:list):
         pass
 
 
+    def load_graphics(self):
+        pass
 

@@ -15,7 +15,7 @@ class TileLayer:
         self.properties: dict  = layer_properties
         self.tilesize:   tuple = tile_size
          
-        self.tiles:     list  = []
+        self.tiles: list  = []
 
     def load_init(self):
         self.bitmap = Level.convert_bitmap_1d_to_2d(bitmap=self.bitmap, size=self.size)
@@ -48,7 +48,7 @@ class TileLayer:
                     layer_id=self.id,
                     tile_size=self.tilesize,
                     tile_pos=[ii*self.tilesize[0]*SPRITEMODULE.scale_factor, i*self.tilesize[1]*SPRITEMODULE.scale_factor],
-                    tile_textures=[SPRITEMODULE.return_tile_texture(spritesheet=TileLayer.tilesets[x]["spritesheet"], index=TileLayer.tilesets[x]["texture_index"])],
+                    tile_textures=[SPRITEMODULE.return_tile_texture(spritesheet=TileLayer.tilesets[x][0], index=TileLayer.tilesets[x][1])],
                     tile_rect=rect if layerid == "1" else None,
                     tile_properties={}
                 )
