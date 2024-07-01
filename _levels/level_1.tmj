@@ -101,10 +101,22 @@
          "y":0
         }, 
         {
+         "class":"entity",
          "draworder":"topdown",
          "id":15,
          "name":"Entities",
-         "objects":[],
+         "objects":[
+                {
+                 "height":0,
+                 "id":2,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":48,
+                 "y":64
+                }],
          "opacity":1,
          "type":"objectgroup",
          "visible":true,
@@ -112,6 +124,7 @@
          "y":0
         }, 
         {
+         "class":"lighting",
          "draworder":"topdown",
          "id":13,
          "name":"Lighting",
@@ -132,11 +145,11 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":19,
- "nextobjectid":1,
+ "nextlayerid":22,
+ "nextobjectid":3,
  "orientation":"orthogonal",
  "renderorder":"right-down",
- "tiledversion":"1.10.2",
+ "tiledversion":"1.11.0",
  "tileheight":16,
  "tilesets":[
         {
