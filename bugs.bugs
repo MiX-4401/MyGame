@@ -1,1 +1,2 @@
 Shouldn't the game be renderering at real size and scale to resolution afterward?
+Tie the Tile.get_frame() to main.py self.time therefore frame will change per game tick

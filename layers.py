@@ -1,5 +1,6 @@
-from tiles  import Tile
-from pygame import Rect
+from tiles    import Tile
+from pygame   import Rect
+from graphics import Canvas
 
 
 class TileLayer:
@@ -17,8 +18,10 @@ class TileLayer:
          
         self.tiles: list  = []
 
+        self.load_init()
+
     def load_init(self):
-        self.bitmap = Level.convert_bitmap_1d_to_2d(bitmap=self.bitmap, size=self.size)
+        self.bitmap = TileLayer.convert_bitmap_1d_to_2d(bitmap=self.bitmap, size=self.size)
         self.load_tiles()
 
 
@@ -49,13 +52,20 @@ class TileLayer:
                     tile_size=self.tilesize,
                     tile_pos=[ii*self.tilesize[0]*SPRITEMODULE.scale_factor, i*self.tilesize[1]*SPRITEMODULE.scale_factor],
                     tile_textures=[SPRITEMODULE.return_tile_texture(spritesheet=TileLayer.tilesets[x][0], index=TileLayer.tilesets[x][1])],
-                    tile_rect=rect if layerid == "1" else None,
+                    tile_rect=rect if self.id == "1" else None,
                     tile_properties={}
                 )
 
 
                 tiles.append(tile)
         self.tiles = tiles
+
+
+    def draw(self, canvas:Canvas):
+        """Draw tiles onto given canvas"""
+        
+        for tile in self.tiles:
+            canvas.blit(source=tile.get_frame(), pos=tile.pos)
 
 
     @staticmethod
@@ -83,7 +93,13 @@ class ImageLayer:
         self.properties:  dict  = layer_properties
 
 
+    def draw(self, canvas:Canvas):
+        pass
+
+
 class EntityLayer:
+    canvas_id: int = 0
+
     def __init__(self, master_level, layer_name:str, layer_id:int, layer_entities:list, layer_properties:dict):
         self.master           = master_level
         self.name:       str  = layer_name
@@ -92,13 +108,28 @@ class EntityLayer:
         self.properties: dict = layer_properties
 
 
+    def draw(self, canvas:Canvas):
+        pass
+
+        # for entity in self.entities:
+        #     canvas.blit(source=entity.get_frame())
+
+
 class LightingLayer:
+    centre_canvas_id: int = 0
+    near_canvas_id:   int = 0
     def __init__(self, master_level, layer_name:str, layer_id:int, layer_lights:list, layer_properties:dict):
         self.master           = master_level
         self.name:       str  = layer_name
         self.id:         int  = layer_id
         self.lights:     list = layer_lights
         self.properties: dict = layer_properties
+
+
+    def draw(self, canvas:Canvas):
+        pass
+
+
 
 
 class CollisionLayer:

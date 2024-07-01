@@ -106,8 +106,13 @@ class Graphics:
             print(f"Graphics: releasing: {tex} @ {self.textures[tex]}")
 
 
-    def draw(self, destination:str, source:str, pos:tuple, area:tuple=None):
-        self.canvases[destination].blit(source=self.canvases[source], pos=pos, area=area)
+    def draw(self):
+
+        # Draw canvases to 'main' canvas
+        for canvas in self.canvases:
+            if canvas == "main": continue
+            self.canvases["main"].blit(source=self.canvases[canvas])
+
         
 
 

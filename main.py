@@ -117,8 +117,9 @@ class Main:
         #     vao=self.modules["shaders"].vaos["shader"],
         #     uniforms={"uTime": self.time}
         # )
-        self.modules["world"].current_level.draw()
 
+        self.modules["world"].current_level.draw()
+        self.modules["graphics"].draw()
 
         # Blit 'main' canvas onto screen
         self.modules["graphics"].ctx.screen.use()
@@ -126,6 +127,7 @@ class Main:
         self.modules["shaders"].vaos["main"].render(mode=mgl.TRIANGLE_STRIP)
 
         pg.display.flip()
+
 
     def run(self):
         while True:
@@ -140,6 +142,8 @@ class Main:
                 trace.print_exc()
 
                 self.garbage_cleanup()
+
+
 
 if __name__ == "__main__":
     main: Main = Main(screen_size=(1920//1.5, 1080//1.5), sprite_scale_factor=3, caption="Game")

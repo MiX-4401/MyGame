@@ -32,14 +32,5 @@
 class A:
     b = 1
 
-class C():
-    def __init__(self):
-        print(A.b)
-
-
-
-
-cl = C()
-
-
+print(A().__class__.__name__)
 
